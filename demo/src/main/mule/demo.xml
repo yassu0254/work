@@ -15,6 +15,7 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
 		<flow-ref doc:name="sub Flow Reference" doc:id="441d14ec-d19a-4e97-aa44-15078fc924ae" name="Subflow"/>
 		<logger level="INFO" doc:name="end Logger" doc:id="68bc342e-27aa-4220-822d-9e6891d702c4" message="end logger"/>
 		<logger level="INFO" doc:name="Logger" doc:id="e6755edd-30a0-4b58-a306-82f5f174b138" message="end of the project"/>
+		<logger level="INFO" doc:name="Logger" doc:id="79d86d71-7315-4529-97eb-9547c70a30ef" message="The end"/>
 	</flow>
 	<flow name="PrivateFlow" doc:id="c6f1a15b-c39e-48a2-b3cf-73d2b04ae3be" >
 		<logger level="INFO" doc:name="Logger" doc:id="95afd7b8-a93e-4f22-94a3-c028e9b26df9" message="Private Flow"/>
