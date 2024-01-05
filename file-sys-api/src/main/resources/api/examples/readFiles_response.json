@@ -1,0 +1,18 @@
+[
+  {
+    "productId": 1001,
+    "productName": "customer"
+  },
+  {
+    "productId": 1002,
+    "productName": "retailer"
+  },
+  {
+    "productId": 1003,
+    "productName": "wholesaler"
+  },
+  {
+    "productId": 1004,
+    "productName": "vendor"
+  }
+]

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+	<flow name="soapFlow" doc:id="7ffc1948-68c3-4820-a552-35f00c804ae7" >
+		<http:listener doc:name="Consuming Soap API" doc:id="eb150019-d6cb-4c04-8911-cef24ce1703b" config-ref="HTTP_Listener_config" path="/soap"/>
+		<set-variable value="#[attributes.queryParams.number1]" doc:name="storing number 1" doc:id="17c719ee-28ff-4e9e-8f61-5227d0707163" variableName="number1"/>
+		<set-variable value="#[attributes.queryParams.number2]" doc:name="storing number 2" doc:id="4aadc7c7-7b2c-44de-aaf1-4f1640c48acf" variableName="number2"/>
+		<ee:transform doc:name="Logic" doc:id="ec97ac12-54ea-4880-938d-1333c9208e6d">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://tempuri.org/
+---
+{
+	ns0#Subtract: {
+		ns0#intA: vars.number1 as Number,
+		ns0#intB: vars.number2 as Number
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<wsc:consume doc:name="Calling Soap API" doc:id="dba795f8-4510-46d3-a7ad-0b0318dc6ed2" config-ref="Web_Service_Consumer_Config" operation="Subtract"/>
+		<ee:transform doc:name="Converting xml to json" doc:id="6ed450e5-1cd9-4985-854e-f0fa4f393725" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

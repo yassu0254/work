@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<flow name="parallel_foreachFlow" doc:id="fc2a9df7-c87c-42dc-8465-a02e0330065b" >
+		<http:listener doc:name="Listener" doc:id="e6728c88-e034-4de6-adfc-d9cedc0e258e" config-ref="HTTP_Listener_config" path="/parallel"/>
+		<ee:transform doc:name="Transform Message" doc:id="25efd44c-717a-4551-a49b-1234d017e1c6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+1 to 100 map {
+	id: 200 + $$,
+	name: "siva",
+	number: 1234567890,
+	lname: "reddy"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="9cf6a3be-369b-415d-bad0-6f7330bd37da" message="#[payload]"/>
+		<parallel-foreach doc:name="Parallel For Each" doc:id="0ffb5753-a34b-4cb7-939d-9115cf0c3a66" >
+			<logger level="INFO" doc:name="Logger" doc:id="a2282710-9fdd-46ec-9814-032a4e0ed2f4" message="#[payload]"/>
+			<db:insert doc:name="Insert" doc:id="acd372c6-7799-41fd-9756-48f96aede07e" config-ref="Database_Config">
+				<db:sql ><![CDATA[insert into student (id, name, number, lname)
+values (:id, :name, :number, :lname);]]></db:sql>
+				<db:input-parameters ><![CDATA[#[payload]]]></db:input-parameters>
+			</db:insert>
+		</parallel-foreach>
+	</flow>
+</mule>

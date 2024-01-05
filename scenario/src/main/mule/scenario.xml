@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+	<file:config name="File_Config" doc:name="File Config" doc:id="4f6b787b-9f93-4eb6-bf69-e9f50ba3b6ae" />
+	<file:config name="File_Config1" doc:name="File Config" doc:id="f7e7bd36-fb71-44da-ae49-2045b3571fcc" />
+	<flow name="scenarioFlow" doc:id="c709698c-c52c-46e6-a4ad-376f309499fb" >
+		<http:listener doc:name="incoming payload" doc:id="d01fb368-04af-4843-a2ab-c412201367c7" config-ref="HTTP_Listener_config" path="${http.path}"/>
+		<logger level="INFO" doc:name="Logger" doc:id="3882cc86-84c8-4f9b-99b4-b4f545e8524c" message="#[uuid()]" />
+		<file:read doc:name="Read_file1" doc:id="54bdbdfe-72f0-4cac-83ca-49441e36b782" config-ref="File_Config" path="${file_first.path}"/>
+		<jms:publish doc:name="first file" doc:id="df3f1b67-704e-415b-acf3-90dfbb22a6c3" config-ref="JMS_Config" destination="${jms.first}" sendCorrelationId="AUTO"/>
+		<foreach doc:name="For Each" doc:id="1681515c-bf1c-4869-93eb-f869e58eed43" >
+			<file:write doc:name="final" doc:id="005e831f-73a6-430c-8597-eff2da6f2d37" config-ref="File_Config1" path="${file_write}" mode="APPEND" />
+		</foreach>
+		<file:read doc:name="Read_file2" doc:id="5a32493d-5fc1-4e41-868e-cafeacfa99af" config-ref="File_Config" path="${file_second.path}"/>
+		<jms:publish doc:name="second file" doc:id="7dc9ae54-402a-4ffe-bd46-7e0d6dcfeede" config-ref="JMS_Config" destination="${jms.second}" sendCorrelationId="AUTO"/>
+		<foreach doc:name="For Each" doc:id="b685c628-7632-469c-96cc-69e1e8d5c4a6" >
+			<file:write doc:name="final" doc:id="0bf005dd-80e7-4147-9e63-e6978e711e2b" config-ref="File_Config1" path="${file_write}" mode="APPEND" />
+		</foreach>
+	</flow>
+</mule>

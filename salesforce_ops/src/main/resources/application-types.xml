@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="sample" format="json">
+      <types:shape format="weave" example="examples/sfdc.json"><![CDATA[%dw 2.0
+
+type sample = Array<{|  name: String,   email: String|}> {"example": "[{\\\"name\\\":\\\"yas\\\",\\\"email\\\":\\\"abc@gmail.com\\\"},{\\\"name\\\":\\\"ram\\\",\\\"email\\\":\\\"efg@gmail.com\\\"},{\\\"name\\\":\\\"raghu\\\",\\\"email\\\":\\\"hij@gmail.com\\\"},{\\\"name\\\":\\\"kish\\\",\\\"email\\\":\\\"hij@gmail.com\\\"},{\\\"name\\\":\\\"tej\\\",\\\"email\\\":\\\"klm@gmail.com\\\"}]"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+</types:mule>

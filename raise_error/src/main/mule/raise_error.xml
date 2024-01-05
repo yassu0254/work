@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="raise_errorFlow" doc:id="a2a1bdc2-d254-465a-8e02-c37fd1efd4eb" >
+		<http:listener doc:name="Listener" doc:id="89ca65f1-5cc2-43a0-8f51-6cd23f3636d9" config-ref="HTTP_Listener_config" path="/raise"/>
+		<set-variable value="200" doc:name="Set Variable" doc:id="d5a55c11-1426-449e-8b4d-3b72f7fa68d9" variableName="amount"/>
+		<choice doc:name="Choice" doc:id="2cd58775-23f8-4a6f-b3ef-6b93ca45a556" >
+			<when expression="#[payload.order_amount &lt;= vars.amount]">
+				<logger level="INFO" doc:name="Logger" doc:id="8d88e211-6c08-4eb9-8185-703cd48f614c" message="#[payload]"/>
+				<ee:transform doc:name="Transform Message" doc:id="50274b84-48d0-42a3-978c-7fdbb1bfcc2c" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"message": "Order Created Successfully"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<raise-error doc:name="Raise error" doc:id="4e244aba-8ce2-4be8-a6ce-28a9d3fe6d36" type="if:INSUFFICIENT_FUNDS" description="Amount less than the expected"/>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>

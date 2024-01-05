@@ -1,0 +1,33 @@
+#%RAML 1.0
+title: file-sys-api
+version: v1
+mediaType: [application/json]
+description: Insert data from file to database
+
+traits:
+  statusCodes: !include /exchange_modules/fc76866c-6c92-4031-b634-56d55d05b0d4/status-code/1.0.0/status-code.raml
+  file: !include /traits/filenotfound.raml
+  client: !include /exchange_modules/fc76866c-6c92-4031-b634-56d55d05b0d4/client-credentials-required/1.0.0/client-credentials-required.raml
+securitySchemes:
+  security: !include /exchange_modules/fc76866c-6c92-4031-b634-56d55d05b0d4/security/1.0.0/security.raml
+/ping:
+  get:
+    description: Check whether API is active or not
+    is: [statusCodes, file, client]
+    securedBy: [security]
+    responses:
+      200:
+        body:
+          example: !include /examples/pingresponse.json
+
+/readFiles:
+  post:
+    description: reading a file from directoryPath
+    body:
+      example: !include /examples/readfiles_request.json
+    is: [statusCodes, file, client]
+    securedBy: [security]
+    responses:
+      200:
+        body:
+          example: !include /examples/readFiles_response.json

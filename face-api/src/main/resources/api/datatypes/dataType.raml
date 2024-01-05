@@ -1,0 +1,50 @@
+#%RAML 1.0 DataType
+
+type: object
+
+properties:
+
+  firstname:
+    required: true
+    type: string
+    minLength: 1
+    maxLength: 20
+    description: "please enter valid name"
+    example: "yaswanth kumar"
+
+  surname:
+    required: true
+    type: string
+    minLength: 1
+    maxLength: 20
+    description: "please enter valid surname"
+    example: "m"
+
+  mobile:
+    required: true
+    type: number
+    minimum: 0000000000
+    maximum: 9999999999
+    description: "please enter valid mobile number"
+    example: 9876543210
+
+  password:
+    required: true
+    type: string
+    minLength: 6
+    maxLength: 15
+    description: "please enter valid password"
+    example: "yassu02"
+  
+  dateofbirth:
+    required: true
+    type: string
+    example: "04 jul 1994"
+    description: "enter valid date"
+
+  gender:
+    required: true
+    type: string
+    enum: [Female, Male, Custom]
+    description: "Select gender"
+    example: Male
