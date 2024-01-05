@@ -1,0 +1,42 @@
+#%RAML 1.0
+title: calsi_api
+version: v1
+protocols: [HTTP,HTTPS]
+mediaType: [application/json]
+
+traits:
+  que: !include /traits/trait.raml
+
+/addition:
+  get:
+    is: [que]
+    responses:
+      200:
+        body:
+            example: !include /examples/addition_reponse.json
+
+/substraction:
+  get:
+    is: [que]
+    responses:
+      200:
+        body:
+            example: !include /examples/substraction_response.json
+
+/multiplication:
+  get:
+    is: [que]
+    responses:
+      200:
+        body:
+            example: !include /examples/multiplication_response.json
+
+/division:
+  get:
+    is: [que]
+    responses:
+      200:
+        body:
+            example: !include /examples/division_response.json
+
+      

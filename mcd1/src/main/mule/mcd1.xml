@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+	<file:config name="File_Config" doc:name="File Config" doc:id="3c0318e1-412f-462f-808f-85248586fcf8" />
+	<validation:config name="Validation_Config" doc:name="Validation Config" doc:id="71f6fa47-a018-4e1f-96b1-7bc174fbc31f" />
+	<flow name="mcd1Flow" doc:id="42f62ed0-b71a-476a-bbd3-b5ae58b1385e" initialState="stopped">
+		<http:listener doc:name="Listener" doc:id="57675149-82de-427e-8fbd-cf8dfbacfd7d" config-ref="HTTP_Listener_config" path="/mcd"/>
+		<db:select doc:name="Select" doc:id="86e9a77c-4c79-4ae1-8114-354bc8929d20" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from db33.facebook limit 5]]></db:sql>
+		</db:select>
+		<logger level="INFO" doc:name="Logger" doc:id="469d6c58-05ab-4290-9c87-3e2f22287500" message="#[typeOf(payload)]"/>
+		<set-payload value='#[output application/json --- "Response"]' doc:name="Set Payload" doc:id="0ab0e343-f8c1-46e2-861f-cd383815095e" />
+	</flow>
+	<flow name="AcceptOrder" doc:id="16d2963c-f4bc-49bd-922b-c2947be028a1" initialState="stopped">
+		<http:listener doc:name="Listener" doc:id="22c3447e-4ef1-490d-8019-918e291d89b2" config-ref="HTTP_Listener_config" path="/order" allowedMethods="POST"/>
+		<file:write doc:name="Write" doc:id="6bf24152-e1c4-4711-91c1-b2a5607fdd49" config-ref="File_Config" path="D:\Mulesoft\batch\orderCreation.json" mode="APPEND"/>
+		<set-payload value='#["File Written"]' doc:name="File Written" doc:id="0da23c8c-724c-4c1c-9967-358af53eb00e" />
+	</flow>
+	<flow name="batch_processing" doc:id="73f17faa-558c-4b16-8059-6e109974d6a5" initialState="stopped">
+		<scheduler doc:name="Scheduler" doc:id="a297fbc2-d8f7-45df-8740-d6c917fc6625" >
+			<scheduling-strategy >
+				<fixed-frequency/>
+			</scheduling-strategy>
+		</scheduler>
+		<set-payload value='#[["a", "b", "c"]]' doc:name='["a", "b", "c"]' doc:id="67d0d0e0-22e3-4793-b6a4-b64cf5645794" />
+		<batch:job jobName="mcd1Batch_Job" doc:id="cb13ef11-ee1b-43a3-88d9-bd81eb237d01" >
+			<batch:process-records >
+				<batch:step name="Batch_Step" doc:id="e3e5b4e3-9e14-4803-a3c3-915b4e1f82f7" >
+					<set-payload value="#[upper(payload)]" doc:name="upper(payload)" doc:id="08572fce-8eec-47ce-bb75-89416ce48cf6" />
+				</batch:step>
+			</batch:process-records>
+			<batch:on-complete >
+				<logger level="INFO" doc:name="payload" doc:id="bbfc563c-b88b-46da-9792-b4c9003e4d9a" message="#[payload]"/>
+			</batch:on-complete>
+		</batch:job>
+	</flow>
+	<flow name="batch" doc:id="97cf798c-97b1-4b85-8218-6a027ba4bf88" initialState="stopped">
+		<http:listener doc:name="Listener" doc:id="44327d88-f411-44b4-94ab-61a991bb25b6" config-ref="HTTP_Listener_config" path="/mcd"/>
+		<batch:job jobName="mcd1Batch_Job1" doc:id="af7b5620-ce78-4a84-a762-12b3e3d698cc" >
+			<batch:process-records >
+				<batch:step name="lessthan500" doc:id="686e125a-f86d-405d-b397-3856aac74736" acceptExpression="payload.amount &lt; 500">
+					<set-payload value='#[{"amount": payload.amount + 100}]' doc:name='{"amount": payload.amount + 100}' doc:id="88301a97-11ed-44a3-bee1-146e37697d0a" />
+					<logger level="INFO" doc:name="payload" doc:id="d2b71a50-4296-4e00-8a72-389fb52de135" message="#[payload]"/>
+				</batch:step>
+				<batch:step name="greaterthan200" doc:id="7b0a14f5-5e2e-4dd4-92ed-8a298ccc3eaf" acceptExpression="payload.amount &gt; 200">
+					<set-payload value='#[{"step2amount": payload.amount}]' doc:name='{"step2amount": payload.amount}' doc:id="0c53f8ad-6ed9-43f0-b068-820144211ac0" />
+					<logger level="INFO" doc:name="payload" doc:id="6025dee0-f06c-4d5b-bf07-fbbc3688099a" message="#[payload]"/>
+				</batch:step>
+			</batch:process-records>
+		</batch:job>
+	</flow>
+	<flow name="scatter_gather" doc:id="904b0548-4fff-4abd-b3f9-1dbc9a25fab1" initialState="stopped">
+		<http:listener doc:name="Listener" doc:id="19299032-44b8-41cb-9b1d-c0aeb91e89b3" config-ref="HTTP_Listener_config" path="/sc"/>
+		<set-variable value="#[now()]" doc:name="startTime To now()" doc:id="afdb2d0d-c6b3-4424-ab8d-0b40251d2f55" variableName="starttime"/>
+		<scatter-gather doc:name="Scatter-Gather" doc:id="4c89c164-7299-4169-8bf3-b4b07cf2aa61" >
+			<route >
+				<flow-ref doc:name="sleep 1 sec" doc:id="1df345c8-e6eb-4ed5-8f2f-0505698888b4" name="sleep1sec"/>
+			</route>
+			<route >
+				<flow-ref doc:name="sleep 5 sec" doc:id="a7c0c071-912c-49f2-be5d-94d40f1f4fea" name="sleep5sec"/>
+			</route>
+		</scatter-gather>
+		<set-payload value="#[vars.starttime]" doc:name="now() - startTime" doc:id="aabff069-31ae-4586-98c0-49eb09ffcf3d" />
+	</flow>
+	<sub-flow name="sleep1sec" doc:id="dfb18196-18de-4674-9762-f9f0658782d2" >
+		<logger level="INFO" doc:name="1sec 1" doc:id="7f74fc2b-8906-4976-91b4-586e985edbb9" message="#[payload]"/>
+	</sub-flow>
+	<sub-flow name="sleep5sec" doc:id="fdd591ac-4ea6-4ab2-adfc-4f843a99ea30" >
+		<logger level="INFO" doc:name="5 sec 1" doc:id="634675b9-b07f-4db6-aac2-e38959c7c582" message="#[payload]"/>
+		<logger level="INFO" doc:name="5 sec 2" doc:id="2a36a958-c6a0-4df0-b708-962acd33bc92" message="#[payload]"/>
+		<logger level="INFO" doc:name="5 sec 3" doc:id="127484e6-8584-4a09-97f4-0545126bc43f" message="#[payload]"/>
+		<logger level="INFO" doc:name="5 sec 4" doc:id="12cec92b-e1e3-4bf0-a5fa-d851d1c7c216" message="#[payload]"/>
+		<logger level="INFO" doc:name="5 sec 5" doc:id="5c3a52cb-3dcb-4351-8326-d2bcf20cd7bd" />
+	</sub-flow>
+	<flow name="validatePayload" doc:id="8a692dd1-0114-4bc9-b636-ca41880c9a28" initialState="stopped">
+		<http:listener doc:name="Listener" doc:id="e0a582f8-93a2-47aa-839b-bd65b6e7c49f" config-ref="HTTP_Listener_config" path="/validation"/>
+		<set-payload value="start" doc:name='"start"' doc:id="eba5d9bf-ee79-4bf5-bfd6-cd7ac80fd0b8" />
+		<validation:is-blank-string doc:name="Is blank string" doc:id="adbdbc3e-5a29-41bf-bec6-4cd31e788a8f" config-ref="Validation_Config" value="#[payload]"/>
+		<set-payload value="end" doc:name='"end"' doc:id="6931420f-df09-430a-b1c0-2b904c5b0353" />
+	</flow>
+	<flow name="messageAttributes" doc:id="d97f18e3-84ec-4bad-b093-8a7fee5c3e6e" initialState="stopped">
+		<scheduler doc:name="Scheduler" doc:id="5475bc94-05df-4b00-b3a2-a9a4aed430b0" >
+			<scheduling-strategy >
+				<fixed-frequency/>
+			</scheduling-strategy>
+		</scheduler>
+		<set-variable value='#[{first: "max", last: "mule"}]' doc:name='customer = {first: "max", last: "mule"}' doc:id="3cd479ff-c2e6-43ca-a562-e4e736dbb670" variableName="customer"/>
+		<logger level="INFO" doc:name="first" doc:id="813c385c-f427-41b8-8cac-c483a56b7943" message="#[vars.customer.last]"/>
+	</flow>
+	<flow name="batch_aggregator_payload" doc:id="82f98fa9-132a-4293-8afb-a2055df1698b" initialState="stopped">
+		<scheduler doc:name="Scheduler" doc:id="d36c2bf0-8fcd-46dd-9bff-00271050d821" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="10000"/>
+			</scheduling-strategy>
+		</scheduler>
+		<set-payload value='#[["a", "b", "c", "d", "e"]]' doc:name='["a", "b", "c", "d", "e"]' doc:id="2f57564f-47f3-4f39-ac2a-ed1836487063" />
+		<batch:job jobName="processRecordBatch_Job" doc:id="1b637b6b-5a99-4fc2-b77a-e0e3c64e49d0" >
+			<batch:process-records >
+				<batch:step name="Batch_Step_with_filter" doc:id="c6dffc2f-0938-4a6e-ad98-d97b7333da81" acceptExpression='#[not (payload contains "b")]'>
+					<ee:transform doc:name="Transform Message" doc:id="a8fabb14-edd1-4cca-b9b4-cb4992031b33" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+upper(payload)]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+					<logger level="INFO" doc:name="Logger" doc:id="7193d4af-318e-47aa-840b-491b7ae5ba60" message="#[payload]"/>
+					<batch:aggregator doc:name="Batch_Aggregator_by_3" doc:id="c752b123-239c-4fd3-8302-5e75d949afc1" size="3">
+						<logger level="INFO" doc:name="payload" doc:id="57e85d4b-c8c8-42c8-8d26-50e905262de9" message="#[payload]"/>
+					</batch:aggregator>
+				</batch:step>
+			</batch:process-records>
+			<batch:on-complete>
+				<logger level="INFO" doc:name="payload" doc:id="55f18311-f690-48e2-99f0-3a40e783fadc" message="#[payload]" />
+			</batch:on-complete>
+		</batch:job>
+		<logger level="INFO" doc:name="Logger" doc:id="295e93b0-3bff-4d66-b5d1-7124b365fbe8" message="#[payload]"/>
+	</flow>
+	<flow name="mcd1Flow1" doc:id="d8abaaf9-b3a5-48bb-b060-58cf277d0316" initialState="stopped">
+		<http:listener doc:name="Listener" doc:id="e51aa1ba-d67c-49e9-a5f7-cbeb735b32a3" config-ref="HTTP_Listener_config" path="/pay"/>
+		<set-payload value="#[[1, 2, 3, 4, 5, 6]]" doc:name="[1, 2, 3, 4]" doc:id="366f261e-570b-46f3-8f0b-295597ee7e20" />
+		<set-variable value="10" doc:name="quantity=10" doc:id="b0d3479f-de5e-4e33-87fe-ad6b7768c90d" variableName="quantity"/>
+		<foreach doc:name="For Each" doc:id="fd2dc1dd-2cc7-45f8-8aad-bef366f106b5" >
+			<set-payload value='#["order" ++ payload]' doc:name='"order" ++ payload' doc:id="4b0236c6-a286-450f-8204-e3f01280bcd4" />
+			<set-variable value="#[vars.quantity + 1]" doc:name="quantity+1" doc:id="a9f7927b-7432-4980-b25d-84c650cb8269" variableName="quantity"/>
+		</foreach>
+		<logger level="INFO" doc:name="payload" doc:id="47718437-c9cd-4b95-bae3-613536046076" message="#[[payload, vars.quantity]]"/>
+	</flow>
+</mule>

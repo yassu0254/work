@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="99dc1c2e-6e6b-4032-b862-968f56d875e9" >
+		<http:listener-connection host="localhost" port="8081" />
+	</http:listener-config>
+	<flow name="demoFlow" doc:id="1ac90143-df19-40a2-aa60-5574cc3c1185" >
+		<http:listener doc:name="Listener" doc:id="262ee2dd-ae9d-4e16-9123-178e46662aa6" config-ref="HTTP_Listener_config" path="/demo"/>
+		<logger level="INFO" doc:name="start Logger" doc:id="7b8cdc0e-97f3-4451-9444-c304f342024e" message="start logger"/>
+		<flow-ref doc:name="private Flow Reference" doc:id="fbcaf22d-de4c-478c-ad44-402087fba226" name="PrivateFlow"/>
+		<flow-ref doc:name="sub Flow Reference" doc:id="441d14ec-d19a-4e97-aa44-15078fc924ae" name="Subflow"/>
+		<logger level="INFO" doc:name="end Logger" doc:id="68bc342e-27aa-4220-822d-9e6891d702c4" message="end logger"/>
+		<logger level="INFO" doc:name="Logger" doc:id="e6755edd-30a0-4b58-a306-82f5f174b138" message="end of the project"/>
+	</flow>
+	<flow name="PrivateFlow" doc:id="c6f1a15b-c39e-48a2-b3cf-73d2b04ae3be" >
+		<logger level="INFO" doc:name="Logger" doc:id="95afd7b8-a93e-4f22-94a3-c028e9b26df9" message="Private Flow"/>
+	</flow>
+	<flow name="Subflow" doc:id="0e8fe6f1-e13b-423b-bbf2-1a03691a1d4d" >
+		<logger level="INFO" doc:name="Logger" doc:id="2d083490-3cf3-42b4-9944-f51298984578" message="Sub Flow"/>
+	</flow>
+</mule>

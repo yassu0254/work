@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<flow name="batchfileFlow" doc:id="1d0c13ee-ef13-49d4-a6c7-21eb5d2e715e" >
+		<http:listener doc:name="Listener" doc:id="d866f8e6-fe8d-42e6-93b6-add6ebe994f7" config-ref="HTTP_Listener_config" path="/batchfile"/>
+		<file:read doc:name="Read" doc:id="69685a45-2b89-42af-b6d9-5e57cfb41dfa" path="D:\Mulesoft\batch\class.csv"/>
+		<ee:transform doc:name="Transform Message" doc:id="ed4d9dd8-5d3c-474c-a450-d9b9d08f0f8f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	name: payload01.name,
+	id: payload01.id,
+	marks: payload01.marks,
+	status: payload01.status
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="31eb9aa2-7a69-4e5f-86c4-97b75e870a0e" message="#[payload]"/>
+		<batch:job jobName="batchfileBatch_Job" doc:id="c8359d4e-a43d-4745-abc5-971f634fa72b" >
+			<batch:process-records >
+				<batch:step name="Batch_Step" doc:id="6a5034d8-0269-4108-ab5a-9b375a376f5f" >
+					<batch:aggregator doc:name="Batch Aggregator" doc:id="e6d1e4e2-13fe-4987-b698-a7933868ef1d" size="20">
+						<logger level="INFO" doc:name="Logger" doc:id="ab82b4c4-4761-4412-951f-51382d26b6ed" message="#[payload]"/>
+						<db:bulk-insert doc:name="Bulk insert" doc:id="87e94859-d518-4ff3-8a04-8df5fdc49cf8" config-ref="Database_Config">
+							<db:sql ><![CDATA[insert into students (id, name, marks, status)
+values (:id, :name, :marks, :status);]]></db:sql>
+						</db:bulk-insert>
+					</batch:aggregator>
+				</batch:step>
+			</batch:process-records>
+			<batch:on-complete >
+				<ee:transform doc:name="Transform Message" doc:id="a75a1385-cdd8-47ec-b454-a6ec24b277d8" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Logger" doc:id="1e68c9e0-4e46-47eb-89be-089d4e16df47" message="#[payload]"/>
+			</batch:on-complete>
+		</batch:job>
+	</flow>
+</mule>

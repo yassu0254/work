@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<error-handler name="global-errorError_Handler" doc:id="c1cb5002-8f2a-41d6-ba8b-76a576037707" >
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="b7bcefaf-315f-49f7-a3e2-085534dd4817" >
+			<raise-error doc:name="Raise error" doc:id="338a7d69-8075-4d5b-b176-9f4f5bde24d7" type="if:INSUFFICIENT_FUNDS" description="Check the query of the database and order amount 200 and more than 200"/>
+		</on-error-continue>
+	</error-handler>
+</mule>

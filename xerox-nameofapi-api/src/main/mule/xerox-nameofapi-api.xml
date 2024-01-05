@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd">
+	<flow name="xerox-nameofapi-apiFlow" doc:id="c607169f-23bf-4fe3-aad7-2fa76aa08f4b" >
+		<http:listener doc:name="http listner" doc:id="6e2ce81e-a7ed-4c70-9775-74ed63699019" config-ref="HTTP_Listener_config" path="${http.path}"/>
+		<logger level="INFO" doc:name="incoming request" doc:id="469b44c8-0da7-44e8-956b-8aae0f56db48" message='"flow Started" #[payload]'/>
+		<apikit:router doc:name="APIkit Router" doc:id="594a5994-306b-4513-9313-0dd475a7a1ed" config-ref="Router"/>
+	</flow>
+	<flow name="xerox-nameofapi-apiFlow1" doc:id="1c56fd4d-a534-47f3-99cf-3cbb57f10abe" >
+		<logger level="INFO" doc:name="resource logger" doc:id="f4bbb06b-ae35-436a-a723-965d89b8c266" message='"readFile Resource Started" #[payload]'/>
+		<flow-ref doc:name="refering logicflow" doc:id="98d32590-2bd4-4a4f-9841-2a61b0715257" name="logicFlow"/>
+	</flow>
+</mule>

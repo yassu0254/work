@@ -1,0 +1,22 @@
+#%RAML 1.0
+title: calcula
+version: v1
+description: Adding two number
+mediaType: [application/json]
+
+/addition:
+  get:
+    queryParameters:
+      number1:
+        required: true
+        type: number
+      number2:
+        required: true
+        type: number
+    responses:
+      200:
+        body:
+          example:
+            {
+              "result": 12
+            }
