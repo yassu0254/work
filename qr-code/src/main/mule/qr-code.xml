@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="qr-codeFlow" doc:id="07e1f57b-c80b-4e8b-8742-623f24074597" >
+		<http:listener doc:name="Listener" doc:id="4dfd05d0-3e9b-403e-a4e5-f2a28d897d83" config-ref="HTTP_Listener_config" path="${http.path}"/>
+		<http:request method="GET" doc:name="Request" doc:id="214abb24-9522-4fa8-b45c-0b719ec5f174" config-ref="HTTP_Request_configuration" path="/create-qr-code">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"data" : attributes.queryParams.data,
+	"size" : attributes.queryParams.size
+}]]]></http:query-params>
+		</http:request>
+	</flow>
+</mule>
